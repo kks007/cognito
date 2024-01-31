@@ -5,9 +5,9 @@ from nltk.tokenize import word_tokenize
 from nltk.probability import FreqDist
 from nltk.tokenize import sent_tokenize
 
-# Download NLTK data (run this once)
-nltk.download('stopwords')
-nltk.download('punkt')
+# # Download NLTK data (run this once)
+# nltk.download('stopwords')
+# nltk.download('punkt')
 
 def calculate_word_frequencies(text):
     stop_words = set(stopwords.words("english"))
