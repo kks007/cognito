@@ -1,3 +1,4 @@
+# File: my_assistant/document_summarization/summarizer.py
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -15,19 +16,27 @@ def calculate_word_frequencies(text):
     fdist = FreqDist(filtered_words)
     return fdist
 
-def summarize_text(text, summary_length):
+def summarize_text(text, num_sentences=None, summary_length=None):
+    if num_sentences and summary_length:
+        raise ValueError("Please provide either --num-sentences or --summary-length, not both.")
+
     sentences = sent_tokenize(text)
     word_frequencies = calculate_word_frequencies(text)
     sentence_scores = {sentence: sum(word_frequencies[word] for word in word_tokenize(sentence.lower()) if word.isalnum()) for sentence in sentences}
 
-    sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
+    if num_sentences:
+        sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)[:num_sentences]
+    else:
+        sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
 
-    word_count = 0
-    summary = []
-    for sentence in sorted_sentences:
-        summary.append(sentence)
-        word_count += len(word_tokenize(sentence))
-        if word_count >= summary_length:
-            break
+        word_count = 0
+        summary = []
+        for sentence in sorted_sentences:
+            summary.append(sentence)
+            word_count += len(word_tokenize(sentence))
+            if summary_length and word_count >= summary_length:
+                break
 
-    return " ".join(summary)
+        return " ".join(summary)
+
+    return " ".join(sorted_sentences)

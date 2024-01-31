@@ -1,3 +1,4 @@
+# File: my_assistant/main.py
 import click
 from document_summarization.summarizer import summarize_text
 from document_summarization.ocr import perform_ocr
@@ -28,9 +29,14 @@ def main(text, file, num_sentences, summary_length):
             with open(file, 'r') as f:
                 text = f.read()
 
-    summary = summarize_text(text, summary_length)
-    click.echo(f"Original Text:\n{text}\n")
-    click.echo(f"Summary ({summary_length} words):\n{summary}")
+    if num_sentences:
+        summary = summarize_text(text, num_sentences)
+        click.echo(f"Original Text:\n{text}\n")
+        click.echo(f"Summary ({num_sentences} sentences):\n{summary}")
+    else:
+        summary = summarize_text(text, summary_length)
+        click.echo(f"Original Text:\n{text}\n")
+        click.echo(f"Summary ({summary_length} words):\n{summary}")
 
 if __name__ == '__main__':
     main()
