@@ -6,7 +6,10 @@ from nltk.stem import WordNetLemmatizer
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 
-nltk.download('wordnet')  # Uncomment this line if you haven't downloaded 'wordnet' yet
+# downloads to be run only once {will fix this dependency later}
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('wordnet')  
 
 def calculate_word_frequencies(text):
     stop_words = set(stopwords.words("english"))
