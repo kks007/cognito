@@ -7,10 +7,11 @@ from document_summarization.ocr import perform_ocr
 @click.option('--text-summary', help='Text to summarize')
 @click.option('--file-summary', type=click.Path(exists=True), help='File to summarize')
 @click.option('--ocr-file', type=click.Path(exists=True), help='File to perform OCR')
-@click.option('--num-sentences', default=3, help='Number of sentences in the summary')
+@click.option('--num-sentences', default=None, help='Number of sentences in the summary')
 @click.option('--summary-length', default=50, help='Desired length of the summary in words')
 @click.option('--lda-train', type=click.Path(exists=True), help='Directory of files to train the LDA model')
 def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train):
+    # rest of the code...
     text = ""
     lda_model = None
 
@@ -46,6 +47,7 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
             click.echo("OCR failed. Please check the image file path and try again.")
             return
 
+    num_sentences = int(num_sentences) if num_sentences else None
     if num_sentences:
         summary = summarize_text(text, num_sentences, lda_model=lda_model)
         click.echo(f"Summary ({num_sentences} sentences):\n{summary}")
