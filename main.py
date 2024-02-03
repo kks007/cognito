@@ -1,7 +1,9 @@
 import os
 import click
+import getpass
 from document_summarization.summarizer import summarize_text, train_lda
 from document_summarization.ocr import perform_ocr
+
 
 @click.command()
 @click.option('--text-summary', help='Text to summarize')
@@ -10,11 +12,20 @@ from document_summarization.ocr import perform_ocr
 @click.option('--num-sentences', default=None, help='Number of sentences in the summary')
 @click.option('--summary-length', default=50, help='Desired length of the summary in words')
 @click.option('--lda-train', type=click.Path(exists=True), help='Directory of files to train the LDA model')
-def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train):
+@click.option('--mail-summary', is_flag=True, help='Fetch and summarize emails')
+
+
+def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary):
     # rest of the code...
     text = ""
     lda_model = None
 
+    if mail_summary:
+        user_id = input("Enter your Gmail ID: ")
+        password = getpass.getpass("Enter your password: ")
+        
+        return
+    
     if lda_train:
         documents = []
         for filename in os.listdir(lda_train):
