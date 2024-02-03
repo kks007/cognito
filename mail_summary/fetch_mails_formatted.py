@@ -7,6 +7,7 @@ import base64
 import email
 from bs4 import BeautifulSoup
 import quopri
+from datetime import datetime, timedelta
 
 # Define the SCOPES. If modifying it, delete the token.pickle file.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -39,8 +40,11 @@ def getEmails():
     # Connect to the Gmail API
     service = build('gmail', 'v1', credentials=creds)
 
-    # request a list of all the messages
-    result = service.users().messages().list(userId='me').execute()
+    # Get the date 24 hours ago
+    date = (datetime.now() - timedelta(days=1)).strftime('%Y/%m/%d')
+
+    # request a list of all the messages received in the last 24 hours
+    result = service.users().messages().list(userId='me', q=f'after:{date}').execute()
 
     # messages is a list of dictionaries where each dictionary contains a message id.
     # iterate through all the messages
