@@ -46,6 +46,9 @@ def getEmails():
     # request a list of all the messages received in the last 24 hours
     result = service.users().messages().list(userId='me', q=f'after:{date}').execute()
 
+    # Create an empty list to store the emails
+    emails = []
+
     # messages is a list of dictionaries where each dictionary contains a message id.
     # iterate through all the messages
     for msg in result.get('messages', []):
@@ -75,13 +78,16 @@ def getEmails():
             soup = BeautifulSoup(decoded_data, 'html.parser')
             body = ' '.join(soup.get_text().split())
 
-            # Printing the subject, sender's email, time, and message
-            print("Subject: ", subject)
-            print("From: ", sender)
-            print("Time: ", time)
-            print("Message: ", body)
-            print('\n')
+            # Add the email to the list
+            emails.append({
+                'Subject': subject,
+                'From': sender,
+                'Time': time,
+                'Message': body
+            })
         except Exception as e:
             print(f"Error processing email: {e}")
 
-getEmails()
+    # Return the list of emails
+    return emails
+

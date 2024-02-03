@@ -1,9 +1,8 @@
 import os
 import click
-import getpass
 from document_summarization.summarizer import summarize_text, train_lda
 from document_summarization.ocr import perform_ocr
-
+from mail_summary.fetch_mails_formatted import getEmails
 
 @click.command()
 @click.option('--text-summary', help='Text to summarize')
@@ -21,9 +20,16 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
     lda_model = None
 
     if mail_summary:
-        user_id = input("Enter your Gmail ID: ")
-        password = getpass.getpass("Enter your password: ")
-        
+      # Call the function and store the emails in a variable
+        emails = getEmails()
+
+        # Print the emails
+        for email in emails:
+            print("Subject: ", email['Subject'])
+            print("From: ", email['From'])
+            print("Time: ", email['Time'])
+            print("Message: ", email['Message'])
+            print('\n')
         return
     
     if lda_train:
