@@ -2,3 +2,4 @@ nltk
 pytesseract
 Pillow
 click
+tkinter

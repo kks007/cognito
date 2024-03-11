@@ -15,7 +15,7 @@ from mail_summary.fetch_mails_formatted import getEmails
 
 
 def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary):
-    # rest of the code...
+
     text = ""
     lda_model = None
 
