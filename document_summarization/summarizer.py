@@ -6,10 +6,10 @@ from nltk.stem import WordNetLemmatizer
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 
-# downloads to be run only once {will fix this dependency later}
+# Ensure the necessary NLTK resources are downloaded once (you can run these once in a separate setup script)
 # nltk.download('stopwords')
 # nltk.download('punkt')
-# nltk.download('wordnet')  
+# nltk.download('wordnet')
 
 def calculate_word_frequencies(text):
     stop_words = set(stopwords.words("english"))
@@ -43,26 +43,56 @@ def train_lda(documents, num_topics=10, passes=2):
     return lda_model
 
 def summarize_text(text, num_sentences=None, summary_length=None, lda_model=None):
-    if num_sentences and summary_length:
-        raise ValueError("Please provide either --num-sentences or --summary-length, not both.")
-
+    # Tokenize the text into sentences
     sentences = sent_tokenize(text)
-    word_frequencies = calculate_word_frequencies(text)
-    sentence_scores = {sentence: sum(word_frequencies[word] for word in word_tokenize(sentence.lower()) if word.isalnum()) + apply_lda(sentence, lda_model) for sentence in sentences}
+    
+    # Tokenize the words and remove stopwords
+    stop_words = set(stopwords.words('english'))
+    words = word_tokenize(text.lower())
+    
+    # Calculate word frequencies
+    word_frequencies = {}
+    for word in words:
+        if word.isalnum() and word not in stop_words:
+            if word not in word_frequencies:
+                word_frequencies[word] = 1
+            else:
+                word_frequencies[word] += 1
 
+    # Normalize word frequencies
+    max_frequency = max(word_frequencies.values())
+    for word in word_frequencies:
+        word_frequencies[word] = word_frequencies[word] / max_frequency
+
+    # Score sentences based on word frequencies
+    sentence_scores = {}
+    for sentence in sentences:
+        for word in word_tokenize(sentence.lower()):
+            if word in word_frequencies:
+                if len(sentence.split(' ')) < 30:  # Only consider shorter sentences
+                    if sentence not in sentence_scores:
+                        sentence_scores[sentence] = word_frequencies[word]
+                    else:
+                        sentence_scores[sentence] += word_frequencies[word]
+
+    # Sort sentences by score
+    sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
+    
+    # Select top sentences based on user input
     if num_sentences:
-        sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)[:num_sentences]
-    else:
-        sorted_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
-
+        summary_sentences = sorted_sentences[:num_sentences]
+    elif summary_length:
+        summary_sentences = []
         word_count = 0
-        summary = []
         for sentence in sorted_sentences:
-            summary.append(sentence)
-            word_count += len(word_tokenize(sentence))
-            if summary_length and word_count >= summary_length:
+            word_count += len(sentence.split())
+            if word_count <= summary_length:
+                summary_sentences.append(sentence)
+            else:
                 break
-
-        return " ".join(summary)
-
-    return " ".join(sorted_sentences)
+    else:
+        num_summary_sentences = max(1, len(sentences) // 3)
+        summary_sentences = sorted_sentences[:num_summary_sentences]
+    
+    summary = ' '.join(summary_sentences)
+    return summary

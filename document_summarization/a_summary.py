@@ -2,9 +2,9 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-# Download necessary NLTK data files (run this only once)
-nltk.download('punkt')
-nltk.download('stopwords')
+# # Download necessary NLTK data files (run this only once)
+# nltk.download('punkt')
+# nltk.download('stopwords')
 
 def summarize_text(text, num_lines=None, num_words=None):
     # Tokenize the text into sentences

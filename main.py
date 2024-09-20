@@ -13,31 +13,21 @@ from mail_summary.fetch_mails_formatted import getEmails
 @click.option('--lda-train', type=click.Path(exists=True), help='Directory of files to train the LDA model')
 @click.option('--mail-summary', is_flag=True, help='Fetch and summarize emails')
 
-
 def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary):
-
     text = ""
     lda_model = None
 
     if mail_summary:
-      # Call the function and store the emails in a variable
         emails = getEmails()
-
-        # Print the emails
         for email in emails:
-            print("Subject: ", email['Subject'])
-            print("From: ", email['From'])
-            print("Time: ", email['Time'])
-            print("Message: ", email['Message'])
-            print('\n')
+            print(f"Subject: {email['Subject']}")
+            print(f"From: {email['From']}")
+            print(f"Time: {email['Time']}")
+            print(f"Message: {email['Message']}\n")
         return
-    
+
     if lda_train:
-        documents = []
-        for filename in os.listdir(lda_train):
-            if filename.endswith(".txt"):
-                with open(os.path.join(lda_train, filename), 'r') as f:
-                    documents.append(f.read())
+        documents = [open(os.path.join(lda_train, f), 'r').read() for f in os.listdir(lda_train) if f.endswith(".txt")]
         lda_model = train_lda(documents)
         click.echo("LDA model trained successfully.")
         return
@@ -50,6 +40,10 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
         click.echo("Please provide only one of --text-summary, --file-summary, or --ocr-file option.")
         return
 
+    if num_sentences and summary_length:
+        click.echo("Please provide only one of --num-sentences or --summary-length option.")
+        return
+
     if text_summary:
         text = text_summary
     elif file_summary:
@@ -58,18 +52,21 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
     elif ocr_file:
         result_text = perform_ocr(ocr_file)
         if result_text:
-            click.echo(f"OCR Result:\n{result_text}\n")
-            return
+            text = result_text
         else:
             click.echo("OCR failed. Please check the image file path and try again.")
             return
 
+    if not text:
+        click.echo("No text provided to summarize.")
+        return
+
     num_sentences = int(num_sentences) if num_sentences else None
+    summary = summarize_text(text, num_sentences, summary_length, lda_model=lda_model)
+
     if num_sentences:
-        summary = summarize_text(text, num_sentences, lda_model=lda_model)
         click.echo(f"Summary ({num_sentences} sentences):\n{summary}")
     else:
-        summary = summarize_text(text, summary_length, lda_model=lda_model)
         click.echo(f"Summary ({summary_length} words):\n{summary}")
 
 if __name__ == '__main__':
