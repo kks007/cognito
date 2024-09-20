@@ -16,14 +16,15 @@ def browse_directory(entry):
     entry.delete(0, tk.END)
     entry.insert(0, directory)
 
-def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary):
+def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary, time_interval=None):
     text = ""
     lda_model = None
     output = ""
 
     # Handle mail summary case
     if mail_summary:
-         emails = getEmails()
+         time_interval = int(time_interval)
+         emails = getEmails(time_interval)
          for email in emails:
 
             no_words = (email['Message']).count(" ")
@@ -87,6 +88,7 @@ def run_main():
         'summary_length': int(summary_length_entry.get()) if summary_length_entry.get() else 50,  # Default to 50 words
         'lda_train': lda_train_entry.get(),
         'mail_summary': mail_summary_var.get(),
+        'time_interval' : time_interval_slider.get()
     }
 
     # Call the main function with the arguments

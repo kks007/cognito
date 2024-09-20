@@ -22,8 +22,13 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
     if mail_summary:
         emails = getEmails(time_interval)
         for email in emails:
-            msg_length = len(email['Message'])
-            email_summary = summarize_text(email['Message'], None, msg_length/2)  # Summarize the email content
+            no_words = (email['Message']).count(" ")
+            if no_words > 80:
+                no_words = no_words/3
+            else:
+                no_words = None
+    
+            email_summary = summarize_text(email['Message'], None, no_words)  # Summarize the email content
             print(f"Subject: {email['Subject']}")
             print(f"From: {email['From']}")
             print(f"Received: {email['Time']}")

@@ -12,16 +12,12 @@ from datetime import datetime, timedelta
 # Define the SCOPES. If modifying it, delete the token.pickle file.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-def getEmails():
+def getEmails(time_interval):
     # Variable creds will store the user access token.
-    # If no valid token found, we will create one.
     creds = None
 
-    # The file token.pickle contains the user access token.
-    # Check if it exists
+    # Check if token.pickle exists
     if os.path.exists('token.pickle'):
-
-        # Read the token from the file and store it in the variable creds
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
 
@@ -40,22 +36,20 @@ def getEmails():
     # Connect to the Gmail API
     service = build('gmail', 'v1', credentials=creds)
 
-    # Get the date 24 hours ago
-    date = (datetime.now() - timedelta(days=1)).strftime('%Y/%m/%d')
+    # Calculate the date for the query
+    since_date = (datetime.now() - timedelta(hours=time_interval)).strftime('%Y/%m/%d')
 
-    # request a list of all the messages received in the last 24 hours
-    result = service.users().messages().list(userId='me', q=f'after:{date}').execute()
+    # Request a list of all the messages received since the calculated date
+    result = service.users().messages().list(userId='me', q=f'after:{since_date}').execute()
 
     # Create an empty list to store the emails
     emails = []
 
-    # messages is a list of dictionaries where each dictionary contains a message id.
-    # iterate through all the messages
+    # Iterate through all the messages
     for msg in result.get('messages', []):
         # Get the message from its id
         txt = service.users().messages().get(userId='me', id=msg['id']).execute()
 
-        # Use try-except to avoid any Errors
         try:
             # Get value of 'payload' from dictionary 'txt'
             payload = txt['payload']
@@ -66,17 +60,16 @@ def getEmails():
             sender = next((d['value'] for d in headers if d['name'] == 'From'), '')
             time = next((d['value'] for d in headers if d['name'] == 'Date'), '')
 
-            # The Body of the message is in Encoded format. So, we have to decode it.
-            # Get the data and decode it with base 64 decoder.
-            parts = payload.get('parts')[0]
-            data = parts['body']['data']
-            data = data.replace("-","+").replace("_","/")
-
-            decoded_data = base64.urlsafe_b64decode(data).decode('utf-8')
-
-            # Now, the data obtained is in text format.
-            soup = BeautifulSoup(decoded_data, 'html.parser')
-            body = ' '.join(soup.get_text().split())
+            # Decode the body of the message
+            parts = payload.get('parts', [])
+            if parts:
+                data = parts[0]['body']['data']
+                data = data.replace("-", "+").replace("_", "/")
+                decoded_data = base64.urlsafe_b64decode(data).decode('utf-8')
+                soup = BeautifulSoup(decoded_data, 'html.parser')
+                body = ' '.join(soup.get_text().split())
+            else:
+                body = "No content"
 
             # Add the email to the list
             emails.append({
@@ -90,4 +83,3 @@ def getEmails():
 
     # Return the list of emails
     return emails
-
