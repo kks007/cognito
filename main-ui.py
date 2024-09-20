@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, ttk
 import os
+import datetime
 from document_summarization.summarizer import summarize_text, train_lda
 from document_summarization.ocr import perform_ocr
 from mail_summary.fetch_mails_formatted import getEmails
@@ -22,10 +23,18 @@ def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, ld
 
     # Handle mail summary case
     if mail_summary:
-        emails = getEmails()
-        for email in emails:
-            output += f"Subject: {email['Subject']}\nFrom: {email['From']}\nTime: {email['Time']}\nMessage: {email['Message']}\n\n"
-        return output
+         emails = getEmails()
+         for email in emails:
+
+            no_words = (email['Message']).count(" ")
+            if no_words > 80:
+                no_words = no_words/3
+            else:
+                no_words = None
+            email_summary = summarize_text(email['Message'], None, no_words)  # Summarize the email content 
+            output += f"Subject: {email['Subject']}\n\nFrom: {email['From']}\n\nTime: {email['Time']} \n\nSummary: {email_summary}\n _____________________________________________________________________________ \n"
+
+         return output
 
     # Handle LDA training
     if lda_train:

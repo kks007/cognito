@@ -1,5 +1,6 @@
 import os
 import click
+import datetime
 from document_summarization.summarizer import summarize_text, train_lda
 from document_summarization.ocr import perform_ocr
 from mail_summary.fetch_mails_formatted import getEmails
@@ -12,18 +13,21 @@ from mail_summary.fetch_mails_formatted import getEmails
 @click.option('--summary-length', default=50, help='Desired length of the summary in words')
 @click.option('--lda-train', type=click.Path(exists=True), help='Directory of files to train the LDA model')
 @click.option('--mail-summary', is_flag=True, help='Fetch and summarize emails')
+@click.option('--time-interval', default=None, type=int, help='Time interval (in hours) for fetching emails')
 
-def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary):
+def main(text_summary, file_summary, ocr_file, num_sentences, summary_length, lda_train, mail_summary, time_interval):
     text = ""
     lda_model = None
 
     if mail_summary:
-        emails = getEmails()
+        emails = getEmails(time_interval)
         for email in emails:
+            msg_length = len(email['Message'])
+            email_summary = summarize_text(email['Message'], None, msg_length/2)  # Summarize the email content
             print(f"Subject: {email['Subject']}")
             print(f"From: {email['From']}")
-            print(f"Time: {email['Time']}")
-            print(f"Message: {email['Message']}\n")
+            print(f"Received: {email['Time']}")
+            print(f"Summary: {email_summary}\n")
         return
 
     if lda_train:
