@@ -3,3 +3,9 @@ pytesseract
 Pillow
 click
 tkinter
+os
+click
+datetime
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
