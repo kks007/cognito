@@ -144,6 +144,20 @@ mail_summary_var = tk.IntVar()
 mail_summary_checkbutton = ttk.Checkbutton(mail_frame, variable=mail_summary_var)
 mail_summary_checkbutton.pack(padx=10, pady=10)
 
+# Add a slider for the time interval
+time_interval_label = ttk.Label(mail_frame, text="Time interval (hours)")
+time_interval_label.pack(padx=10, pady=0)
+time_interval_slider = ttk.Scale(mail_frame, from_=1, to=24, length=500, orient='horizontal')
+time_interval_slider.pack(padx=10, pady=10)
+# Create a canvas for the labels
+canvas = tk.Canvas(mail_frame, width=500, height=30)
+canvas.pack(padx=10, pady=0)
+# Draw the labels on the canvas
+for i in [1, 5, 10, 15, 20, 24]:
+    x = 20.5 * i  # Adjust this value to position the labels correctly
+    canvas.create_text(x, 15, text=str(i))
+
+
 # LDA Training Tab UI
 lda_train_label = ttk.Label(lda_frame, text="Directory for LDA training files")
 lda_train_label.pack(padx=10, pady=10)
@@ -160,6 +174,7 @@ def clear_inputs(event):
     summary_length_entry.delete(0, tk.END)
     ocr_file_entry.delete(0, tk.END)
     mail_summary_var.set(0)
+    time_interval_slider.set(1)
     lda_train_entry.delete(0, tk.END)
 
 notebook.bind('<<NotebookTabChanged>>', clear_inputs)
