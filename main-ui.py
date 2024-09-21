@@ -1,5 +1,7 @@
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog
 import os
 import datetime
 from document_summarization.summarizer import summarize_text, train_lda
@@ -98,10 +100,11 @@ def run_main():
     output_text.delete('1.0', tk.END)
     output_text.insert(tk.END, output)
 
-root = tk.Tk()
+root = ttk.Window(themename="darkly")
+root.title("E.D.I.T.H.")
 
 # Create a Notebook for the UI
-notebook = ttk.Notebook(root)
+notebook = ttk.Notebook(root, style="Custom.TNotebook")
 
 # Create frames for each tab
 summary_frame = ttk.Frame(notebook)
@@ -120,32 +123,32 @@ notebook.pack(fill='both', expand=True)
 # Summary Tab UI
 text_summary_label = ttk.Label(summary_frame, text="Text to summarize")
 text_summary_label.pack(padx=10, pady=10)
-text_summary_entry = ttk.Entry(summary_frame)
+text_summary_entry = ttk.Entry(summary_frame, style="Custom.TEntry")
 text_summary_entry.pack(padx=10, pady=10)
 
 file_summary_label = ttk.Label(summary_frame, text="File to summarize")
 file_summary_label.pack(padx=10, pady=10)
-file_summary_entry = ttk.Entry(summary_frame)
+file_summary_entry = ttk.Entry(summary_frame, style="Custom.TEntry")
 file_summary_entry.pack(padx=10, pady=10)
-file_summary_button = ttk.Button(summary_frame, text="Browse", command=lambda: browse_file(file_summary_entry))
+file_summary_button = ttk.Button(summary_frame, text="Browse", command=lambda: browse_file(file_summary_entry), bootstyle="primary")
 file_summary_button.pack(padx=10, pady=10)
 
 num_sentences_label = ttk.Label(summary_frame, text="Number of sentences")
 num_sentences_label.pack(padx=10, pady=10)
-num_sentences_entry = ttk.Entry(summary_frame)
+num_sentences_entry = ttk.Entry(summary_frame, style="Custom.TEntry")
 num_sentences_entry.pack(padx=10, pady=10)
 
 summary_length_label = ttk.Label(summary_frame, text="Length in words")
 summary_length_label.pack(padx=10, pady=10)
-summary_length_entry = ttk.Entry(summary_frame)
+summary_length_entry = ttk.Entry(summary_frame, style="Custom.TEntry")
 summary_length_entry.pack(padx=10, pady=10)
 
 # OCR Tab UI
 ocr_file_label = ttk.Label(ocr_frame, text="File for OCR")
 ocr_file_label.pack(padx=10, pady=10)
-ocr_file_entry = ttk.Entry(ocr_frame)
+ocr_file_entry = ttk.Entry(ocr_frame, style="Custom.TEntry")
 ocr_file_entry.pack(padx=10, pady=10)
-ocr_file_button = ttk.Button(ocr_frame, text="Browse", command=lambda: browse_file(ocr_file_entry))
+ocr_file_button = ttk.Button(ocr_frame, text="Browse", command=lambda: browse_file(ocr_file_entry), bootstyle="primary")
 ocr_file_button.pack(padx=10, pady=10)
 
 # Mail Tab UI
@@ -166,15 +169,15 @@ canvas.pack(padx=10, pady=0)
 # Draw the labels on the canvas
 for i in [1, 5, 10, 15, 20, 24]:
     x = 20.5 * i  # Adjust this value to position the labels correctly
-    canvas.create_text(x, 15, text=str(i))
+    canvas.create_text(x, 15, text=str(i), fill="white")
 
 
 # LDA Training Tab UI
 lda_train_label = ttk.Label(lda_frame, text="Directory for LDA training files")
 lda_train_label.pack(padx=10, pady=10)
-lda_train_entry = ttk.Entry(lda_frame)
+lda_train_entry = ttk.Entry(lda_frame, style="Custom.TEntry")
 lda_train_entry.pack(padx=10, pady=10)
-lda_train_button = ttk.Button(lda_frame, text="Browse", command=lambda: browse_directory(lda_train_entry))
+lda_train_button = ttk.Button(lda_frame, text="Browse", command=lambda: browse_directory(lda_train_entry), bootstyle="primary")
 lda_train_button.pack(padx=10, pady=10)
 
 # Clear inputs when changing tabs
@@ -191,11 +194,17 @@ def clear_inputs(event):
 notebook.bind('<<NotebookTabChanged>>', clear_inputs)
 
 # Run Button
-run_button = ttk.Button(root, text="Run", command=run_main)
+run_button = ttk.Button(root, text="Run", command=run_main, bootstyle="primary")
 run_button.pack(padx=10, pady=10)
 
 # Output Text Box
-output_text = tk.Text(root)
+output_text = tk.Text(root, bg="#2d2d2d", fg="white", insertbackground="white")
 output_text.pack(padx=10, pady=10)
+
+# Apply custom styles
+style = ttk.Style()
+style.configure("Custom.TNotebook.Tab", padding=[20, 10])
+style.configure("Custom.TEntry", padding=5, relief="solid", bordercolor="gray", borderwidth=1)
+style.map("Custom.TEntry", fieldbackground=[("readonly", "#2d2d2d")], foreground=[("readonly", "white")])
 
 root.mainloop()
