@@ -27,8 +27,8 @@ EDITH is a personal workflow assistant designed to help streamline various tasks
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/sidd1092/edith.git
-    cd edith
+    git clone https://github.com/kks007/cognito
+    cd cognito
     ```
 
 2. Install the required dependencies:
